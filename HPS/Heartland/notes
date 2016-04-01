@@ -1,0 +1,273 @@
+https://www.magentocommerce.com/magento-connect/customerdata/secureKeys/list/
+Public Key:
+da30ffa8ef433f4fcf1c11946c14200e
+Private Key:
+f99d6a33e3285217bae11c6a1da96ff8
+
+# installation on blank box
+# http://devdocs.magento.com/guides/v2.0/install-gde/prereq/apache.html
+sudo apt-get -y install apache2
+service apache2 restart
+a2enmod rewrite
+
+#PHP
+sudo apt-get -y update
+sudo add-apt-repository ppa:ondrej/php5-5.6
+sudo apt-get -y update
+sudo apt-get -y install php5 php5-mhash php5-mcrypt php5-curl php5-cli php5-mysql php5-gd php5-intl php5-xsl php5-bcmath
+
+# always_populate_raw_post_data = -1
+# memory_limit = 2G
+sudo nano /etc/php5/apache2/php.ini
+sudo nano /etc/php5/cli/php.ini
+
+service apache2 restart
+
+dsf
+
+sudo adduser magento_user
+usermod -g www-data magento_user
+service apache2 restart
+
+# MySQL
+# http://devdocs.magento.com/guides/v2.0/install-gde/prereq/mysql.html
+sudo apt-get -y install mysql-server-5.6 mysql-client-5.6
+mysql_secure_installation
+mysql -u root -p
+create database magento;
+GRANT ALL ON magento.* TO magento@localhost IDENTIFIED BY 'magento';
+
+# phpmyadmin
+sudo apt-get install phpmyadmin
+http://<web server host or IP>/phpmyadmin
+
+service apache2 restart
+
+### copy the software from the repo
+# composer
+curl -sS https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+
+#Create auth.json
+
+#To create auth.json:
+
+#Log in to your Magento server as, or switch to, the Magento file system owner.
+#Edit or create auth.json in the user’s home directory.
+https://github.com/settings/tokens/new?scopes=repo&description=Composer+on+ubuntu+2015-12-29+1203
+composer config github-oauth.github.com 4acc4bd630079e6d3ebb4b644250899e0b59aba8
+#The following example shows how to add repo.magento.com authentication to an existing file:
+# using my public and private key
+{
+    "http-basic": {
+        "repo.magento.com": {
+            "username": "da30ffa8ef433f4fcf1c11946c14200e",
+            "password": "f99d6a33e3285217bae11c6a1da96ff8"
+        }
+    }
+}
+
+#For example, if your user name is magento_user, create or edit /home/magento_user/.composer/auth.json
+su magento_user
+nano /home/magento_user/.composer/auth.json
+#paste the contents and press ctrl+x
+
+
+# GIT CLONE
+# http://devdocs.magento.com/guides/v2.0/install-gde/prereq/dev_install.html
+
+su root
+sudo apt-get -y install git
+cd /var/www/html
+git clone -b 2.0 https://github.com/magento/magento2.git
+cp -Ra /var/www/html/magento2/. /var/www/html
+rm -R /var/www/html/magento2
+
+# configure the updater
+
+git clone https://github.com/magento/magento2-community-edition.git
+mkdir /var/www/html/update
+cp -Ra /var/www/html/magento2-community-edition/update/. /var/www/html/update
+rm -R /var/www/html/magento2-community-edition
+
+# Now run the install
+composer install
+
+cd /var/www/html/update
+composer install
+
+# file ownership and permissions
+# http://devdocs.magento.com/guides/v2.0/install-gde/install/prepare-install.html
+chown -R magento_user:www-data /var/www/html
+sudo find /var/www/html -type d -exec chmod 770 {} \;
+sudo find /var/www/html -type f -exec chmod 660 {} \;
+sudo chmod u+x /var/www/html/bin/magento
+
+export PATH=$PATH:/var/www/html/bin
+cd /var/www/html
+magento cron:run
+magento cron:run
+cd update
+php cron.phplocate php
+cd /var/www/html
+composer
+
+#########################################################################
+# install node and npm
+apt-get install node.js
+apt-get install npm
+cd /var/www/html
+npm install -g grunt-cli
+npm install grunt --save-dev
+npm install
+npm update
+
+##############################################################################
+# sample data
+cd /var/www/html/
+git clone https://github.com/magento/magento2-sample-data.git
+cd magento2-sample-data/dev/tools
+php -f build-sample-data.php -- --ce-source="/var/www/html/"
+php -f /var/www/html/magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/var/www/html/"
+
+php /var/www/html/bin/magento sampledata:deploy
+
+cd /var/www/html
+########################################################################
+# CLI install path
+# http://devdocs.magento.com/guides/v2.0/install-gde/install/cli/install-cli-subcommands.html
+# http://devdocs.magento.com/guides/v2.0/install-gde/install/cli/install-cli-install.html
+########################################################################
+cd bin
+magento setup:install --base-url=http://127.0.0.1/ \
+--db-host=localhost --db-name=magento --db-user=magento --db-password=magento \
+--admin-firstname=Magento --admin-lastname=User --admin-email=charles.simmons@e-hps.com \
+--admin-user=tank --admin-password=M@ataka11 --language=en_US \
+--currency=USD --timezone=America/Chicago --use-rewrites=1
+
+########################################################################
+# CLI install path
+# http://devdocs.magento.com/guides/v2.0/install-gde/install/cli/install-cli-subcommands.html
+# http://devdocs.magento.com/guides/v2.0/install-gde/install/cli/install-cli-install.html
+########################################################################
+
+
+########################################################################
+# Recommended install path
+# http://devdocs.magento.com/guides/v2.0/install-gde/install/web/install-web.html
+# find the install log after
+# http://devdocs.magento.com/guides/v2.0/install-gde/install/web/install-web_6-install.html
+########################################################################
+*/1 * *
+
+cifconfig eth0 192.168.0.88 netmask 255.255.255.0
+# nice to know
+magento info:adminuri
+cat app/etc/env.php
+nano /var/www/html/app/etc/env.php
+# nice to know
+
+ulimit -s 65536
+
+########################################################################
+# set up cron
+# http://devdocs.magento.com/guides/v2.0/install-gde/install/post-install-config.html
+# http://devdocs.magento.com/guides/v2.0/comp-mgr/prereq/prereq_compman-updater.html
+########################################################################
+
+export PATH=$PATH:/var/www/html/bin
+
+crontab -u magento_user -e
+#crontab -e
+*/1 * * * * php /var/www/html/pub/cron.php &
+*/1 * * * * php /var/www/html/bin/magento setup:cron:run &
+*/1 * * * * php -c /etc/php5/cli/php.ini /var/www/html/bin/magento cron:run &
+*/1 * * * * php -c /etc/php5/cli/php.ini /var/www/html/update/cron.php &
+*/1 * * * * php -c /etc/php5/cli/php.ini /var/www/html/bin/magento setup:cron:run &
+02 4 * * * /usr/bin/updatedb -e /mnt/data,/mnt/files
+
+
+php /var/www/html/pub/cron.php
+php /var/www/html/bin/magento setup:cron:run
+php -c /etc/php5/cli/php.ini /var/www/html/bin/magento cron:run
+php -c /etc/php5/cli/php.ini /var/www/html/update/cron.php
+php -c /etc/php5/cli/php.ini /var/www/html/bin/magento setup:cron:run
+
+./magento cron:run
+
+php cron.php
+sudo bin/magento module:enable --clear-static-content module-tank bin/magento setup:upgrade
+
+cat /var/mail/magento_user
+truncate -s 0 /var/mail/magento_user
+
+
+
+
+composer upgrade
+
+
+
+############# recovering from an explosion
+//////////////////////////////////////////////
+
+cd /var/www/html
+magento maintenance:status
+magento maintenance:disable
+echo 'clearing cache'
+rm -rf var/cache/* var/page_cache/* var/generation/*
+echo 'upgrade'
+magento setup:upgrade
+echo 'compile modules'
+magento setup:di:compile
+composer install
+composer upgrade
+echo 'fixing permissions'
+chown -R magento_user:www-data /var/www/html
+sudo find /var/www/html -type d -exec chmod 770 {} \;
+sudo find /var/www/html -type f -exec chmod 660 {} \;
+sudo chmod u+x /var/www/html/bin/magento
+sudo chmod u+x /var/www/html/pc.sh
+
+export PATH=$PATH:/var/www/html/bin
+cd /var/www/html
+magento cron:run
+magento cron:run
+cd update
+php cron.php
+cd /var/www/html
+
+
+
+# http://devdocs.magento.com/guides/v2.0/install-gde/install/cli/install-cli-backup.html
+# making a backup
+bin/magento setup:backup --code --db
+
+# looking at backups
+bin/magento info:backups:list
+
+#restore file system
+bin/magento setup:rollback -c <pick from list>
+# restore db
+bin/magento setup:rollback -d <pick from list>
+############# recovering from an explosion
+//////////////////////////////////////////////
+
+http://devdocs.magento.com/guides/v2.0/comp-mgr/compman-main-pg.html
+
+wget http://download.magephp.com/magallanes.latest.tar.gz -O magallanes.tar.gz
+tar xfz magallanes.tar.gz
+
+cd magallanes
+bin/mage install --systemWide --installDir=/opt/magallanes
+mage compile
+./mage.phar version
+mage upgrade
+mage init --name="HPS" --email="charles.simmons@e-hps.com"
+mage add environment --name="production" --enableReleases
+nano .mage/config/environments/production.yml
+
+The following tasks are available for usage with Magento:
+
+magento/clear-cache - Clears Cache.
+magento/clear-full-page-cache - Clears Full Page Cache.

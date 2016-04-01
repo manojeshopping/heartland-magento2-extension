@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../lib/internal/Magento/Framework/App/etc/routes.xsd">
+    <router id="standard">
+        <route id="public_key" frontName="public_key">
+            <module name="HPS_Heartland" />
+        </route>
+        <route id="hps_vault" frontName="hps_vault">
+            <module name="HPS_Heartland" />
+        </route>
+    </router>
+</config>

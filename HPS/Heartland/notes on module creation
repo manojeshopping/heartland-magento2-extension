@@ -1,0 +1,35 @@
+http://alanstorm.com/magento_2_mvvm_mvc
+/var/www/html
+
+
+
+# clear cache
+rm -rf /var/www/html/var/generation/*
+rm -rf /var/www/html/var/cache/*
+
+# the goal
+http://magento.example.com/hello_mvc/hello/world
+
+Apparently this directory structure
+Pulsestorm/HelloWorldMVVM
+means the module will be named
+Pulsestorm_HelloWorldMVVM
+
+
+bin/magento module:status
+
+php bin/magento setup:upgrade
+
+
+
+Routing in Magento 2
+We’re going to make Magento 2 respond to the following URL
+
+http://magento.example.com/index.php/hello_mvvm/hello/world
+The index.php portion is optional — if you have mod_rewrite (or your web server’s equivalent) enabled, this URL is the same as
+
+http://magento.example.com/hello_mvvm/hello/world
+In Magento 2, each individual module can claim a “front name”. The “front name” is the first segment of the URL — in our case that’s hello_mvvm. When a module “claims” a front name, that is its way of saying
+
+Another good tutorial
+good for dealing with forms and db but not as in depth as alanstorm

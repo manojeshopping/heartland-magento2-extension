@@ -1,0 +1,1 @@
+Module HPS\Heartland implements integration with the Heartland payment system.
